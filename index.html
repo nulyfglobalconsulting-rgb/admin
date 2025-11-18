@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nulyf Global Admin Panel</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <!-- Axios for API calls -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .hidden {
+      display: none;
+    }
+    #doctorsTable, #testimonialsTable, #blogsTable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #doctorsTable th, #doctorsTable td,
+    #testimonialsTable th, #testimonialsTable td,
+    #blogsTable th, #blogsTable td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    #doctorsTable th, #testimonialsTable th, #blogsTable th {
+      background-color: #f7fafc;
+      font-weight: 600;
+    }
+    #doctorsTable tr:hover, #testimonialsTable tr:hover, #blogsTable tr:hover {
+      background-color: #f1f5f9;
+    }
+    .form-section {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Login Section -->
+  <div id="loginSection" class="min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96 text-center">
+      <h1 class="text-2xl font-bold mb-6">Nulyf Global Admin</h1>
+      <p class="mb-4">Sign in with Google to access the admin panel.</p>
+      <button id="googleSignInBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center mx-auto">
+        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l3.92-3.88C18.727 1.453 16.827 0 14.64 0 7.58 0 .32 5.613.32 12.747c0 2.12.473 4.053 1.247 5.787-5.947 2.6-10.447 8.24-10.447 16 0 3.067 1.08 5.827 2.88 8.027L12.48 10.92z" />
+        </svg>
+        Sign in with Google
+      </button>
+    </div>
+  </div>
+  <!-- Admin Panel Section -->
+  <div id="adminPanelSection" class="hidden min-h-screen bg-gray-100 p-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Nulyf Global Admin Panel</h1>
+        <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+          Logout
+        </button>
+      </div>
+      <!-- Forms Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <!-- Add Doctor Form -->
+        <div class="form-section">
+          <h2 class="text-xl font-bold mb-4">Add Doctor</h2>
+          <form id="doctorForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Name</label>
+              <input type="text" id="doctorName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Specialty</label>
+              <input type="text" id="doctorSpecialty" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Qualifications</label>
+              <input type="text" id="doctorQualifications" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Experience</label>
+              <input type="text" id="doctorExperience" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Location</label>
+              <input type="text" id="doctorLocation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Hospital</label>
+              <input type="text" id="doctorHospital" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Image URL</label>
+              <input type="text" id="doctorImageUrl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Add Doctor
+            </button>
+          </form>
+        </div>
+        <!-- Add Testimonial Form -->
+        <div class="form-section">
+          <h2 class="text-xl font-bold mb-4">Add Testimonial</h2>
+          <form id="testimonialForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Name</label>
+              <input type="text" id="testimonialName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Location</label>
+              <input type="text" id="testimonialLocation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Rating</label>
+              <select id="testimonialRating" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                <option value="5">5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="2">2 Stars</option>
+                <option value="1">1 Star</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Content</label>
+              <textarea id="testimonialContent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" rows="4" required></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Image URL</label>
+              <input type="text" id="testimonialImageUrl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+              Add Testimonial
+            </button>
+          </form>
+        </div>
+        <!-- Add Blog Form -->
+        <div class="form-section">
+          <h2 class="text-xl font-bold mb-4">Add Blog</h2>
+          <form id="blogForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Title</label>
+              <input type="text" id="blogTitle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Content</label>
+              <textarea id="blogContent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" rows="6" required></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Excerpt</label>
+              <textarea id="blogExcerpt" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" rows="2" required></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Author</label>
+              <input type="text" id="blogAuthor" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Image URL</label>
+              <input type="text" id="blogImageUrl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Tags (comma separated)</label>
+              <input type="text" id="blogTags" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
+            </div>
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+              Add Blog
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- Tables Grid -->
+      <div class="grid grid-cols-1 gap-8">
+        <!-- Doctors Table -->
+        <div class="form-section">
+          <h2 class="text-xl font-bold mb-4">Doctors</h2>
+          <div class="overflow-x-auto">
+            <table id="doctorsTable">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th>Name</th>
+                  <th>Specialty</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="doctorsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Testimonials Table -->
+        <div class="form-section">
+          <h2 class="text-xl font-bold mb-4">Testimonials</h2>
+          <div class="overflow-x-auto">
+            <table id="testimonialsTable">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th>Name</th>
+                  <th>Rating</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="testimonialsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Blogs Table -->
+        <div class="form-section">
+          <h2 class="text-xl font-bold mb-4">Blogs</h2>
+          <div class="overflow-x-auto">
+            <table id="blogsTable">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="blogsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Firebase and JavaScript -->
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUY8A-KOUz-CJmqmbP-K2Se6KhS8izRbs",
+      authDomain: "consluting-fac03.firebaseapp.com",
+      projectId: "consluting-fac03",
+      storageBucket: "consluting-fac03.appspot.com",
+      messagingSenderId: "895208912479",
+      appId: "1:895208912479:web:4706851765dea9f2724dea",
+      measurementId: "G-YKFHNPPFEK"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    // DOM Elements
+    const loginSection = document.getElementById('loginSection');
+    const adminPanelSection = document.getElementById('adminPanelSection');
+    const googleSignInBtn = document.getElementById('googleSignInBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const doctorForm = document.getElementById('doctorForm');
+    const testimonialForm = document.getElementById('testimonialForm');
+    const blogForm = document.getElementById('blogForm');
+    const doctorsTableBody = document.getElementById('doctorsTableBody');
+    const testimonialsTableBody = document.getElementById('testimonialsTableBody');
+    const blogsTableBody = document.getElementById('blogsTableBody');
+    let idToken = null;
+    // Google Sign-In
+    googleSignInBtn.addEventListener('click', () => {
+      auth.signInWithPopup(googleProvider)
+        .then((result) => {
+          return result.user.getIdToken();
+        })
+        .then((token) => {
+          idToken = token;
+          loginSection.classList.add('hidden');
+          adminPanelSection.classList.remove('hidden');
+          fetchDoctors();
+          fetchTestimonials();
+          fetchBlogs();
+        })
+        .catch((error) => {
+          console.error("Error signing in:", error);
+          alert("Error signing in. Please try again.");
+        });
+    });
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut()
+        .then(() => {
+          loginSection.classList.remove('hidden');
+          adminPanelSection.classList.add('hidden');
+          idToken = null;
+        })
+        .catch((error) => {
+          console.error("Error signing out:", error);
+        });
+    });
+    // Fetch Doctors
+    function fetchDoctors() {
+      axios.get('https://globalback-z1st.onrender.com/api/doctors')
+        .then((response) => {
+          doctorsTableBody.innerHTML = '';
+          response.data.forEach((doctor) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${doctor.name}</td>
+              <td>${doctor.specialty}</td>
+              <td>
+                <button class="text-red-600 hover:text-red-900 delete-doctor" data-id="${doctor.id}">Delete</button>
+              </td>
+            `;
+            doctorsTableBody.appendChild(row);
+          });
+          // Add event listeners to delete buttons
+          document.querySelectorAll('.delete-doctor').forEach((button) => {
+            button.addEventListener('click', (e) => {
+              const doctorId = e.target.getAttribute('data-id');
+              deleteDoctor(doctorId);
+            });
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching doctors:", error);
+          alert("Error fetching doctors. Please try again.");
+        });
+    }
+    // Delete Doctor
+    function deleteDoctor(doctorId) {
+      axios.delete(`https://globalback-z1st.onrender.com/api/doctors/${doctorId}`, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      })
+      .then(() => {
+        fetchDoctors();
+      })
+      .catch((error) => {
+        console.error("Error deleting doctor:", error);
+        alert("Error deleting doctor. You may not have permission.");
+      });
+    }
+    // Add Doctor
+    doctorForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const doctorData = {
+        name: document.getElementById('doctorName').value,
+        specialty: document.getElementById('doctorSpecialty').value,
+        qualifications: document.getElementById('doctorQualifications').value,
+        experience: document.getElementById('doctorExperience').value,
+        location: document.getElementById('doctorLocation').value,
+        hospital: document.getElementById('doctorHospital').value,
+        imageUrl: document.getElementById('doctorImageUrl').value
+      };
+      axios.post('https://globalback-z1st.onrender.com/api/doctors', doctorData, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      })
+      .then(() => {
+        doctorForm.reset();
+        fetchDoctors();
+      })
+      .catch((error) => {
+        console.error("Error adding doctor:", error);
+        alert("Error adding doctor. You may not have permission.");
+      });
+    });
+    // Fetch Testimonials
+    function fetchTestimonials() {
+      axios.get('https://globalback-z1st.onrender.com/api/testimonials')
+        .then((response) => {
+          testimonialsTableBody.innerHTML = '';
+          response.data.forEach((testimonial) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${testimonial.name}</td>
+              <td>${testimonial.rating} Star${testimonial.rating !== 1 ? 's' : ''}</td>
+              <td>
+                <button class="text-red-600 hover:text-red-900 delete-testimonial" data-id="${testimonial.id}">Delete</button>
+              </td>
+            `;
+            testimonialsTableBody.appendChild(row);
+          });
+          // Add event listeners to delete buttons
+          document.querySelectorAll('.delete-testimonial').forEach((button) => {
+            button.addEventListener('click', (e) => {
+              const testimonialId = e.target.getAttribute('data-id');
+              deleteTestimonial(testimonialId);
+            });
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching testimonials:", error);
+          alert("Error fetching testimonials. Please try again.");
+        });
+    }
+    // Delete Testimonial
+    function deleteTestimonial(testimonialId) {
+      axios.delete(`https://globalback-z1st.onrender.com/api/testimonials/${testimonialId}`, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      })
+      .then(() => {
+        fetchTestimonials();
+      })
+      .catch((error) => {
+        console.error("Error deleting testimonial:", error);
+        alert("Error deleting testimonial. You may not have permission.");
+      });
+    }
+    // Add Testimonial
+    testimonialForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const testimonialData = {
+        name: document.getElementById('testimonialName').value,
+        location: document.getElementById('testimonialLocation').value,
+        rating: parseInt(document.getElementById('testimonialRating').value),
+        content: document.getElementById('testimonialContent').value,
+        imageUrl: document.getElementById('testimonialImageUrl').value
+      };
+      axios.post('https://globalback-z1st.onrender.com/api/testimonials', testimonialData, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      })
+      .then(() => {
+        testimonialForm.reset();
+        fetchTestimonials();
+      })
+      .catch((error) => {
+        console.error("Error adding testimonial:", error);
+        alert("Error adding testimonial. You may not have permission.");
+      });
+    });
+    // Fetch Blogs
+    function fetchBlogs() {
+      axios.get('https://globalback-z1st.onrender.com/api/blogs')
+        .then((response) => {
+          blogsTableBody.innerHTML = '';
+          response.data.forEach((blog) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${blog.title}</td>
+              <td>${blog.author}</td>
+              <td>
+                <button class="text-red-600 hover:text-red-900 delete-blog" data-id="${blog.id}">Delete</button>
+              </td>
+            `;
+            blogsTableBody.appendChild(row);
+          });
+          // Add event listeners to delete buttons
+          document.querySelectorAll('.delete-blog').forEach((button) => {
+            button.addEventListener('click', (e) => {
+              const blogId = e.target.getAttribute('data-id');
+              deleteBlog(blogId);
+            });
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching blogs:", error);
+          alert("Error fetching blogs. Please try again.");
+        });
+    }
+    // Delete Blog
+    function deleteBlog(blogId) {
+      axios.delete(`https://globalback-z1st.onrender.com/api/blogs/${blogId}`, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      })
+      .then(() => {
+        fetchBlogs();
+      })
+      .catch((error) => {
+        console.error("Error deleting blog:", error);
+        alert("Error deleting blog. You may not have permission.");
+      });
+    }
+    // Add Blog
+    blogForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const blogData = {
+        title: document.getElementById('blogTitle').value,
+        content: document.getElementById('blogContent').value,
+        excerpt: document.getElementById('blogExcerpt').value,
+        author: document.getElementById('blogAuthor').value,
+        imageUrl: document.getElementById('blogImageUrl').value,
+        tags: document.getElementById('blogTags').value.split(',').map(tag => tag.trim())
+      };
+      axios.post('https://globalback-z1st.onrender.com/api/blogs', blogData, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      })
+      .then(() => {
+        blogForm.reset();
+        fetchBlogs();
+      })
+      .catch((error) => {
+        console.error("Error adding blog:", error);
+        alert("Error adding blog. You may not have permission.");
+      });
+    });
+    // Check if user is already logged in
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        user.getIdToken()
+          .then((token) => {
+            idToken = token;
+            loginSection.classList.add('hidden');
+            adminPanelSection.classList.remove('hidden');
+            fetchDoctors();
+            fetchTestimonials();
+            fetchBlogs();
+          });
+      }
+    });
+  </script>
+</body>
+</html>
